@@ -62,10 +62,10 @@ public class Drewisenslavingme2 extends LinearOpMode {
     private DcMotor rightFrontDrive = null;
     private DcMotor lift = null;
     private DcMotor arm = null;
-    private DcMotor hinge = null;
+  //  private DcMotor hinge = null;
     private Servo leftHand = null;
     private Servo rightHand = null;
-    private Servo hookServo = null;
+  //  private Servo hookServo = null;
 
     @Override
     public void runOpMode() {
@@ -81,11 +81,11 @@ public class Drewisenslavingme2 extends LinearOpMode {
         rightFrontDrive = hardwareMap.get(DcMotor.class, "rightFront");
         lift = hardwareMap.get(DcMotor.class, "lift");
         arm = hardwareMap.get(DcMotor.class,"arm");
-        hinge = hardwareMap.get(DcMotor.class, "hinge");
+     //   hinge = hardwareMap.get(DcMotor.class, "hinge");
         leftHand = hardwareMap.get(Servo.class, "leftHand");
         rightHand = hardwareMap.get(Servo.class, "rightHand");
-        hookServo
-                = hardwareMap.get(Servo.class, "hookServo");
+    //    hookServo
+      //          = hardwareMap.get(Servo.class, "hookServo");
 
         // Most robots need the motor on one side to be reversed to drive forward
         // Reverse the motor that runs backwards when connected directly to the battery
@@ -123,7 +123,7 @@ public class Drewisenslavingme2 extends LinearOpMode {
             // Tank Mode uses one stick to control each wheel.
             // - This requires no math, but it is hard to drive forward slowly and keep straight.
             leftPower  = gamepad1.left_stick_y ; //USE THIS FOR UNIFORM DRIVE
-            rightPower = gamepad1.right_stick_y ;
+            rightPower = -gamepad1.right_stick_y ;
 
             /* code to make the robot drive straight easier
             if(driveMode == 0){
@@ -175,7 +175,7 @@ public class Drewisenslavingme2 extends LinearOpMode {
             else {
                 lift.setPower(0);
             }
-            if(gamepad2.dpad_left) {
+      /*      if(gamepad2.dpad_left) {
                 hinge.setPower(0.3);
             }
             else if(gamepad2.dpad_right) {
@@ -183,7 +183,7 @@ public class Drewisenslavingme2 extends LinearOpMode {
             }
             else {
                 hinge.setPower(0);
-            }
+            } */
 
 
      /*       if(gamepad2.a){
@@ -213,11 +213,11 @@ public class Drewisenslavingme2 extends LinearOpMode {
                 }
             }
 
-            if(hookState == 1){
+         /*   if(hookState == 1){
                 hookServo.setPosition(1);
             } else {
                 hookServo.setPosition(0);
-            }
+            } */
 
             if(gamepad2.right_bumper){
                 arm.setPower(.8);
