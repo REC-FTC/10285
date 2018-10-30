@@ -62,6 +62,7 @@ public class Drewisenslavingme2 extends LinearOpMode {
     private DcMotor rightFrontDrive = null;
     private DcMotor lift = null;
     private DcMotor arm = null;
+    private DcMotor hinge = null;
     private Servo leftHand = null;
     private Servo rightHand = null;
     private Servo hookServo = null;
@@ -80,9 +81,11 @@ public class Drewisenslavingme2 extends LinearOpMode {
         rightFrontDrive = hardwareMap.get(DcMotor.class, "rightFront");
         lift = hardwareMap.get(DcMotor.class, "lift");
         arm = hardwareMap.get(DcMotor.class,"arm");
+        hinge = hardwareMap.get(DcMotor.class, "hinge");
         leftHand = hardwareMap.get(Servo.class, "leftHand");
         rightHand = hardwareMap.get(Servo.class, "rightHand");
-        hookServo = hardwareMap.get(Servo.class, "hookServo");
+        hookServo
+                = hardwareMap.get(Servo.class, "hookServo");
 
         // Most robots need the motor on one side to be reversed to drive forward
         // Reverse the motor that runs backwards when connected directly to the battery
@@ -92,6 +95,7 @@ public class Drewisenslavingme2 extends LinearOpMode {
         rightFrontDrive.setDirection(DcMotor.Direction.REVERSE);
         lift.setDirection(DcMotor.Direction.FORWARD);
         arm.setDirection(DcMotor.Direction.FORWARD);
+        hinge.setDirection(DcMotor.Direction.FORWARD);
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
@@ -148,9 +152,11 @@ public class Drewisenslavingme2 extends LinearOpMode {
 
             // Send calculated power to wheels
             if(mode == 0){
-                drive(leftPower, rightPower);
+            leftPower  = gamepad1.left_stick_y ; //USE THIS FOR UNIFORM DRIVE
+            rightPower = gamepad1.right_stick_y ;
             } else {
-                drive(leftPower / slow, rightPower / slow);
+            leftPower  = gamepad1.left_stick_y/4 ; //USE THIS FOR UNIFORM DRIVE
+            rightPower = gamepad1.right_stick_y/4 ;
             }
             /*if(gamepad1.b){
                 if(driveMode == 0){
@@ -169,9 +175,18 @@ public class Drewisenslavingme2 extends LinearOpMode {
             else {
                 lift.setPower(0);
             }
+            if(gamepad2.dpad_left) {
+                hinge.setPower(0.3);
+            }
+            else if(gamepad2.dpad_right) {
+                hinge.setPower(-0.3);
+            }
+            else {
+                hinge.setPower(0);
+            }
 
 
-            if(gamepad2.a){
+     /*       if(gamepad2.a){
                 if(handState == 0){
                     handState = 1;
                 } else {
@@ -179,15 +194,16 @@ public class Drewisenslavingme2 extends LinearOpMode {
                 }
             }
             if(handState == 0){
-                leftHand.setPosition(180);
-                rightHand.setPosition(180);
+                leftHand.setPosition(0);
+                rightHand.setPosition(1);
                 telemetry.addData("Hand State: ", "Open - 180");
             } else {
-                leftHand.setPosition(0);
-                rightHand.setPosition(0);
+                leftHand.setPosition(.5);
+                rightHand.setPosition(.5);
                 telemetry.addData("Hand State: ", "Closed - 0");
-            }
-
+            } */
+        leftHand.setPosition(0.2 - gamepad2.left_trigger);
+        rightHand.setPosition(gamepad2.right_trigger + 0.2);
 
             if(gamepad2.x) {
                 if(hookState == 0){
@@ -198,37 +214,40 @@ public class Drewisenslavingme2 extends LinearOpMode {
             }
 
             if(hookState == 1){
-                hookServo.setPosition(180);
+                hookServo.setPosition(1);
             } else {
                 hookServo.setPosition(0);
             }
 
             if(gamepad2.right_bumper){
-                arm.setPower(.3);
+                arm.setPower(.8);
             } else if(gamepad2.left_bumper) {
-                arm.setPower(-.3);
+                arm.setPower(-.8);
             } else {
                 arm.setPower(0);
             }
-
+            leftBackDrive.setPower(leftPower);
+            leftFrontDrive.setPower(leftPower);
+            rightBackDrive.setPower(rightPower);
+            rightFrontDrive.setPower(rightPower);
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Motors", "left (%.2f), right (%.2f)", leftPower, rightPower);
             telemetry.update();
         }
     }
-    public void drive(double lpower, double rpower){
+  /*  public void drive(double lpower, double rpower){
         leftBackDrive.setPower(lpower);
         leftFrontDrive.setPower(lpower);
         rightBackDrive.setPower(rpower);
         rightFrontDrive.setPower(rpower);
-    }
+    } */
 
-    public void drive(double power) {
+   /* public void drive(double power) {
         leftBackDrive.setPower(power);
         leftFrontDrive.setPower(power);
         rightBackDrive.setPower(power);
         rightFrontDrive.setPower(power);
-    }
+    } */
 
 }
