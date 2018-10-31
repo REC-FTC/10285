@@ -27,6 +27,9 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+//Test is tyler branch
+
+
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -218,7 +221,6 @@ public class Drewisenslavingme2 extends LinearOpMode {
             } else {
                 hookServo.setPosition(0);
             } */
-
             if(gamepad2.right_bumper){
                 arm.setPower(.8);
             } else if(gamepad2.left_bumper) {
