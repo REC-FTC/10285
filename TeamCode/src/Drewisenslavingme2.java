@@ -27,8 +27,6 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-
-
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -62,12 +60,11 @@ public class Drewisenslavingme2 extends LinearOpMode {
     private DcMotor rightBackDrive = null;
     private DcMotor leftFrontDrive = null;
     private DcMotor rightFrontDrive = null;
-    private DcMotor lift = null;
-    private DcMotor arm = null;
-  //  private DcMotor hinge = null;
+    private DcMotor armLift = null;
+    private DcMotor botLift = null;
+    private Servo markerArm = null;
     private Servo leftHand = null;
     private Servo rightHand = null;
-  //  private Servo hookServo = null;
 
     @Override
     public void runOpMode() {
@@ -81,13 +78,12 @@ public class Drewisenslavingme2 extends LinearOpMode {
         rightBackDrive = hardwareMap.get(DcMotor.class, "rightBack");
         leftFrontDrive  = hardwareMap.get(DcMotor.class, "leftFront");
         rightFrontDrive = hardwareMap.get(DcMotor.class, "rightFront");
-        lift = hardwareMap.get(DcMotor.class, "lift");
-        arm = hardwareMap.get(DcMotor.class,"arm");
-     //   hinge = hardwareMap.get(DcMotor.class, "hinge");
+        armLift = hardwareMap.get(DcMotor.class, "armLift");
+        botLift = hardwareMap.get(DcMotor.class, "botLift");
+        markerArm = hardwareMap.get(Servo.class,"arm");
         leftHand = hardwareMap.get(Servo.class, "leftHand");
         rightHand = hardwareMap.get(Servo.class, "rightHand");
-    //    hookServo
-      //          = hardwareMap.get(Servo.class, "hookServo");
+
 
         // Most robots need the motor on one side to be reversed to drive forward
         // Reverse the motor that runs backwards when connected directly to the battery
@@ -95,9 +91,9 @@ public class Drewisenslavingme2 extends LinearOpMode {
         rightBackDrive.setDirection(DcMotor.Direction.REVERSE);
         leftFrontDrive.setDirection(DcMotor.Direction.FORWARD);
         rightFrontDrive.setDirection(DcMotor.Direction.REVERSE);
-        lift.setDirection(DcMotor.Direction.FORWARD);
-        arm.setDirection(DcMotor.Direction.FORWARD);
-        hinge.setDirection(DcMotor.Direction.FORWARD);
+        armLift.setDirection(DcMotor.Direction.FORWARD);
+        botLift.setDirection(DcMotor.Direction.FORWARD);
+
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
@@ -106,15 +102,9 @@ public class Drewisenslavingme2 extends LinearOpMode {
         //mode id, 0 = normal sped, 1 = speedivided b dy the slow modifier
         int mode = 0;
         int slow = 3;
-        //int driveMode = 0;
 
-        //open or closed state for the mineral arm
-        int handState = 0;
-        leftHand.setPosition(0);
-        rightHand.setPosition(0);
+        int direction = 0;
 
-        int hookState = 0;
-        hookServo.setPosition(0);
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
 
@@ -127,21 +117,6 @@ public class Drewisenslavingme2 extends LinearOpMode {
             leftPower  = gamepad1.left_stick_y ; //USE THIS FOR UNIFORM DRIVE
             rightPower = -gamepad1.right_stick_y ;
 
-            /* code to make the robot drive straight easier
-            if(driveMode == 0){
-                if(mode == 0){
-                    drive(leftPower, rightPower);
-                } else {
-                    drive(leftPower / slow, rightPower / slow);
-                }
-            } else {
-                if(mode == 0){
-                    drive(leftPower);
-                } else {
-                    drive(leftPower / slow);
-                }
-            }
-             */
 
             //mode change
             if(gamepad1.a) {
@@ -154,79 +129,64 @@ public class Drewisenslavingme2 extends LinearOpMode {
 
             // Send calculated power to wheels
             if(mode == 0){
-            leftPower  = gamepad1.left_stick_y ; //USE THIS FOR UNIFORM DRIVE
-            rightPower = gamepad1.right_stick_y ;
-            } else {
-            leftPower  = gamepad1.left_stick_y/4 ; //USE THIS FOR UNIFORM DRIVE
-            rightPower = gamepad1.right_stick_y/4 ;
-            }
-            /*if(gamepad1.b){
-                if(driveMode == 0){
-                    driveMode = 1;
+                if(!(gamepad1.left_stick_y == gamepad1.right_stick_y)){
+                    leftPower = gamepad1.left_stick_y / .8;
+                    rightPower = gamepad1.right_stick_y / .8;
                 } else {
-                    driveMode = 0;
+                    leftPower  = gamepad1.left_stick_y; //USE THIS FOR UNIFORM DRIVE
+                    rightPower = gamepad1.right_stick_y;
                 }
-            }*/
+            } else {
+                leftPower  = gamepad1.left_stick_y/4 ; //USE THIS FOR UNIFORM DRIVE
+                rightPower = gamepad1.right_stick_y/4 ;
+            }
+
             //move the lift
+            direction = 0;
             if(gamepad2.dpad_down) {
-                lift.setPower(1);
+                armLift.setPower(0.5);
+                direction = 1;
             }
             else if(gamepad2.dpad_up) {
-                lift.setPower(-1);
+                armLift.setPower(-0.3);
+                direction = 2;
+            } else {
+                armLift.setPower(0);
             }
-            else {
-                lift.setPower(0);
-            }
-      /*      if(gamepad2.dpad_left) {
-                hinge.setPower(0.3);
-            }
-            else if(gamepad2.dpad_right) {
-                hinge.setPower(-0.3);
-            }
-            else {
-                hinge.setPower(0);
-            } */
 
+            // if(!gamepad2.dpad_up && !gamepad2.dpad_down){
+            //     if(direction == 1){
+            //         lift.setPower(-0.5);
+            //         //sleep(500);
+            //     } else if(direction == 0) {
+            //         lift.setPower(0.5);
+            //         //sleep(500);
+            //     } else {
+            //         lift.setPower(0);
+            //     }
 
-     /*       if(gamepad2.a){
-                if(handState == 0){
-                    handState = 1;
-                } else {
-                    handState = 0;
-                }
+            // }
+
+            if(!(gamepad2.right_stick_y == 0)){
+                botLift.setPower(gamepad2.right_stick_y);
+            } else {
+                botLift.setPower(0);
             }
-            if(handState == 0){
+
+            if(gamepad2.left_bumper){
                 leftHand.setPosition(0);
                 rightHand.setPosition(1);
-                telemetry.addData("Hand State: ", "Open - 180");
             } else {
-                leftHand.setPosition(.5);
-                rightHand.setPosition(.5);
-                telemetry.addData("Hand State: ", "Closed - 0");
-            } */
-        leftHand.setPosition(0.2 - gamepad2.left_trigger);
-        rightHand.setPosition(gamepad2.right_trigger + 0.2);
-
-            if(gamepad2.x) {
-                if(hookState == 0){
-                    hookState = 1;
-                } else {
-                    hookState = 0;
-                }
+                leftHand.setPosition(1);
+                rightHand.setPosition(0.5);
             }
 
-         /*   if(hookState == 1){
-                hookServo.setPosition(1);
-            } else {
-                hookServo.setPosition(0);
-            } */
             if(gamepad2.right_bumper){
-                arm.setPower(.8);
-            } else if(gamepad2.left_bumper) {
-                arm.setPower(-.8);
+                markerArm.setPosition(0.6);
             } else {
-                arm.setPower(0);
+                markerArm.setPosition(0);
             }
+
             leftBackDrive.setPower(leftPower);
             leftFrontDrive.setPower(leftPower);
             rightBackDrive.setPower(rightPower);
@@ -237,18 +197,4 @@ public class Drewisenslavingme2 extends LinearOpMode {
             telemetry.update();
         }
     }
-  /*  public void drive(double lpower, double rpower){
-        leftBackDrive.setPower(lpower);
-        leftFrontDrive.setPower(lpower);
-        rightBackDrive.setPower(rpower);
-        rightFrontDrive.setPower(rpower);
-    } */
-
-   /* public void drive(double power) {
-        leftBackDrive.setPower(power);
-        leftFrontDrive.setPower(power);
-        rightBackDrive.setPower(power);
-        rightFrontDrive.setPower(power);
-    } */
-
 }
