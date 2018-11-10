@@ -34,7 +34,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
+import com.qualcomm.robotcore.hardware.Servo;
 // nsfiojaspofji vijsgpioadg iodfj;as
 
 /**
@@ -50,9 +50,9 @@ import com.qualcomm.robotcore.util.Range;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="Drew Drive", group="Linear Opmode")
+@TeleOp(name="Drew Drive2", group="Linear Opmode")
 //@Disabled
-public class Drewisenslavingme extends LinearOpMode {
+public class Drewisenslavingme2 extends LinearOpMode {
 
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
@@ -60,7 +60,11 @@ public class Drewisenslavingme extends LinearOpMode {
     private DcMotor rightBackDrive = null;
     private DcMotor leftFrontDrive = null;
     private DcMotor rightFrontDrive = null;
-    private DcMotor lift;
+    private DcMotor armLift = null;
+    private DcMotor botLift = null;
+    private Servo markerArm = null;
+    private Servo leftHand = null;
+    private Servo rightHand = null;
 
     @Override
     public void runOpMode() {
@@ -74,48 +78,119 @@ public class Drewisenslavingme extends LinearOpMode {
         rightBackDrive = hardwareMap.get(DcMotor.class, "rightBack");
         leftFrontDrive  = hardwareMap.get(DcMotor.class, "leftFront");
         rightFrontDrive = hardwareMap.get(DcMotor.class, "rightFront");
-        lift = hardwareMap.get(DcMotor.class, "lift");
+        armLift = hardwareMap.get(DcMotor.class, "armLift");
+        botLift = hardwareMap.get(DcMotor.class, "botLift");
+        markerArm = hardwareMap.get(Servo.class,"arm");
+        leftHand = hardwareMap.get(Servo.class, "leftHand");
+        rightHand = hardwareMap.get(Servo.class, "rightHand");
+
+
         // Most robots need the motor on one side to be reversed to drive forward
         // Reverse the motor that runs backwards when connected directly to the battery
         leftBackDrive.setDirection(DcMotor.Direction.FORWARD);
         rightBackDrive.setDirection(DcMotor.Direction.REVERSE);
         leftFrontDrive.setDirection(DcMotor.Direction.FORWARD);
         rightFrontDrive.setDirection(DcMotor.Direction.REVERSE);
-        lift.setDirection(DcMotor.Direction.FORWARD);
+        armLift.setDirection(DcMotor.Direction.FORWARD);
+        botLift.setDirection(DcMotor.Direction.FORWARD);
+        
+
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         runtime.reset();
 
-        // run until the end of the match (driver presses STOP)
+        //mode id, 0 = normal sped, 1 = speedivided b dy the slow modifier
+        int mode = 0;
+        int slow = 3;
+        
+        int direction = 0;
+    
+         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
 
             // Setup a variable for each drive wheel to save power level for telemetry
             double leftPower;
             double rightPower;
 
-            // Choose to drive using either Tank Mode, or POV Mode
-            // Comment out the method that's not used.  The default below is POV.
-
             // Tank Mode uses one stick to control each wheel.
             // - This requires no math, but it is hard to drive forward slowly and keep straight.
-             leftPower  = gamepad1.left_stick_y ;
-             rightPower = gamepad1.right_stick_y ;
+            leftPower  = gamepad1.left_stick_y ; //USE THIS FOR UNIFORM DRIVE
+            rightPower = -gamepad1.right_stick_y ;
+
+
+            //mode change
+            if(gamepad1.a) {
+                if(mode == 0){
+                    mode = 1;
+                } else {
+                    mode = 0;
+                }
+            }
 
             // Send calculated power to wheels
+            if(mode == 0){
+                if(!(gamepad1.left_stick_y == gamepad1.right_stick_y)){
+                    leftPower = gamepad1.left_stick_y * 0.55;
+                    rightPower = gamepad1.right_stick_y * .55;
+                } else {
+                    leftPower  = gamepad1.left_stick_y * 0.6; //USE THIS FOR UNIFORM DRIVE
+                    rightPower = gamepad1.right_stick_y * 0.6;
+                }
+            } else {
+                leftPower  = gamepad1.left_stick_y/4 ; //USE THIS FOR UNIFORM DRIVE
+                rightPower = gamepad1.right_stick_y/4 ;
+            }
+
+            //move the lift
+            direction = 0;
+            if(gamepad2.dpad_down) {
+                armLift.setPower(0.5);
+                direction = 1;
+            }
+            else if(gamepad2.dpad_up) {
+                armLift.setPower(-0.3);
+                direction = 2;
+            } else {
+                armLift.setPower(0);
+            }
+            
+            // if(!gamepad2.dpad_up && !gamepad2.dpad_down){
+            //     if(direction == 1){
+            //         lift.setPower(-0.5);
+            //         //sleep(500);
+            //     } else if(direction == 0) {
+            //         lift.setPower(0.5);
+            //         //sleep(500);
+            //     } else {
+            //         lift.setPower(0);
+            //     }
+                
+            // }
+            
+            if(!(gamepad2.right_stick_y == 0)){
+                botLift.setPower(gamepad2.right_stick_y);
+            } else {
+                botLift.setPower(0);
+            }
+        
+            if(gamepad2.left_bumper){
+                leftHand.setPosition(0);
+                rightHand.setPosition(1);
+            } else {
+                leftHand.setPosition(1);
+                rightHand.setPosition(0.5);
+            }
+            
+            if(gamepad2.right_bumper){
+                markerArm.setPosition(0.6);
+            } else {
+                markerArm.setPosition(0);
+            }
+            
             leftBackDrive.setPower(leftPower);
             leftFrontDrive.setPower(leftPower);
             rightBackDrive.setPower(rightPower);
             rightFrontDrive.setPower(rightPower);
-            if(gamepad1.dpad_up) {
-                lift.setPower(1);
-            }
-            else if(gamepad1.dpad_down) {
-                lift.setPower(-1);
-            }
-            else {
-               lift.setPower(0);
-            } 
-
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Motors", "left (%.2f), right (%.2f)", leftPower, rightPower);
